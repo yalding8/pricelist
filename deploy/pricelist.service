@@ -1,0 +1,22 @@
+[Unit]
+Description=Pricelist Web Application
+After=network.target
+
+[Service]
+Type=notify
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/pricelist/current
+Environment="PATH=/var/www/pricelist/current/venv/bin"
+ExecStart=/var/www/pricelist/current/venv/bin/gunicorn \
+    --config gunicorn_config.py \
+    wsgi:application
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=5
+PrivateTmp=true
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

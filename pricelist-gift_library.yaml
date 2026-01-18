@@ -1,0 +1,175 @@
+# 异乡好居礼品库配置
+# 销售顾问可勾选这些礼品，灵活组合报价单内容
+
+gift_library:
+  # 现金类
+  - id: cash_back_300
+    name: 现金返现
+    value: 300
+    unit: GBP
+    category: cash
+    description: 签约后7-10个工作日到账，可通过微信红包、支付宝或银行卡发放
+    icon: 💵
+    sort_order: 1
+
+  - id: cash_back_500
+    name: 现金返现（高额）
+    value: 500
+    unit: GBP
+    category: cash
+    description: VIP客户专享，签约后10个工作日到账
+    icon: 💰
+    sort_order: 2
+
+  # 服务类
+  - id: airport_pickup
+    name: 异乡接机服务
+    value: 80
+    unit: GBP
+    category: service
+    description: 专车接机，直达公寓，提供24小时客服支持
+    icon: ✈️
+    sort_order: 3
+
+  - id: cleaning_service
+    name: 免费清洁服务
+    value: 40
+    unit: GBP
+    category: service
+    description: 专业清洁团队上门服务，包含深度清洁
+    icon: 🧹
+    sort_order: 4
+
+  - id: moving_service
+    name: 搬家服务
+    value: 60
+    unit: GBP
+    category: service
+    description: 专业搬家团队，提供打包和搬运服务
+    icon: 🚚
+    sort_order: 5
+
+  # 优惠券类
+  - id: payment_voucher_50
+    name: 异乡缴费优惠券
+    value: 50
+    unit: GBP
+    category: voucher
+    description: 可用于房租支付抵扣，有效期6个月
+    icon: 💳
+    sort_order: 6
+
+  - id: payment_voucher_100
+    name: 异乡缴费优惠券（大额）
+    value: 100
+    unit: GBP
+    category: voucher
+    description: 可用于房租支付抵扣，有效期12个月
+    icon: 💳
+    sort_order: 7
+
+  - id: broadband_voucher
+    name: 宽带安装券
+    value: 30
+    unit: GBP
+    category: voucher
+    description: 免费上门安装宽带，包含前3个月网费
+    icon: 📶
+    sort_order: 8
+
+  - id: utility_voucher
+    name: 水电费优惠券
+    value: 50
+    unit: GBP
+    category: voucher
+    description: 可抵扣前2个月水电费
+    icon: ⚡
+    sort_order: 9
+
+  # 实物礼品类
+  - id: welcome_pack
+    name: 生活礼包
+    value: 50
+    unit: GBP
+    category: gift
+    description: 包含日用品、零食、文具等新生必备物品
+    icon: 🎁
+    sort_order: 10
+
+  - id: kitchen_set
+    name: 厨房用品套装
+    value: 40
+    unit: GBP
+    category: gift
+    description: 包含锅碗瓢盆、调料等基础厨房用品
+    icon: 🍳
+    sort_order: 11
+
+  - id: bedding_set
+    name: 床上用品套装
+    value: 60
+    unit: GBP
+    category: gift
+    description: 包含被子、枕头、床单等四件套
+    icon: 🛏️
+    sort_order: 12
+
+  - id: study_pack
+    name: 学习礼包
+    value: 30
+    unit: GBP
+    category: gift
+    description: 包含笔记本、文具、台灯等学习用品
+    icon: 📚
+    sort_order: 13
+
+  # 特殊权益
+  - id: priority_support
+    name: 优先客服通道
+    value: 0
+    unit: GBP
+    category: service
+    description: 享受7x24小时VIP客服，问题优先处理
+    icon: 🎯
+    sort_order: 14
+    is_free: true
+
+  - id: early_checkin
+    name: 提前入住权
+    value: 0
+    unit: GBP
+    category: service
+    description: 可提前最多7天免费入住
+    icon: 🔑
+    sort_order: 15
+    is_free: true
+
+# 礼品组合推荐
+gift_bundles:
+  - id: starter_bundle
+    name: 新生入门礼包
+    description: 适合首次留学的新生
+    gift_ids:
+      - airport_pickup
+      - welcome_pack
+      - broadband_voucher
+    total_value: 160
+
+  - id: premium_bundle
+    name: 豪华礼包
+    description: VIP客户专享组合
+    gift_ids:
+      - cash_back_500
+      - airport_pickup
+      - bedding_set
+      - priority_support
+    total_value: 640
+
+  - id: value_bundle
+    name: 超值礼包
+    description: 性价比最高的组合
+    gift_ids:
+      - cash_back_300
+      - payment_voucher_50
+      - welcome_pack
+    total_value: 400

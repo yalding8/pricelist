@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>异乡好居报价单</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'PingFang SC', sans-serif; background: #f5f5f5; }
+        .quote-card { max-width: 750px; margin: 0 auto; background: white; }
+        .header { background: linear-gradient(135deg, #FF5A5F 0%, #E54850 100%); color: white; padding: 32px 24px; text-align: center; }
+        .section { padding: 24px; border-bottom: 1px solid #f0f0f0; }
+        .section-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+        .price-row { display: flex; justify-content: space-between; padding: 12px 0; }
+        .discount-group { background: #f8f9fa; border-radius: 12px; padding: 16px; margin: 16px 0; }
+        .payer-badge { font-size: 12px; padding: 3px 10px; border-radius: 4px; margin-left: 8px; }
+        .payer-badge.landlord { background: #E3F2FD; color: #1976D2; }
+        .payer-badge.uhomes { background: #FFE5E5; color: #FF5A5F; }
+        .discount-item { display: flex; justify-content: space-between; padding: 8px 0 8px 16px; }
+        .discount-amount { color: #4CAF50; font-weight: 500; }
+        .final-price-box { background: linear-gradient(135deg, #FFF3CD 0%, #FFE5E5 100%); padding: 24px; text-align: center; }
+        .final-price-value { font-size: 36px; font-weight: 700; color: #FF5A5F; }
+        .gifts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 12px; }
+        .gift-card { background: white; border: 2px solid #f0f0f0; border-radius: 8px; padding: 12px; display: flex; align-items: center; }
+        .gift-icon { font-size: 32px; margin-right: 12px; }
+        .gift-name { font-size: 14px; font-weight: 600; }
+        .gift-value { font-size: 16px; font-weight: 700; color: #FF5A5F; }
+    </style>
+</head>
+<body>
+    <div class="quote-card">
+        <div class="header">
+            <div style="font-size: 20px; font-weight: 600; margin-bottom: 12px;">异乡好居</div>
+            <h1 style="font-size: 24px;">🏠 专属报价单</h1>
+            <div style="font-size: 18px; margin-top: 8px;">{{ property.property_name }}</div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">📋 房源信息</div>
+            <div class="price-row"><span>户型</span><strong>{{ property.room_type }}</strong></div>
+            <div class="price-row"><span>租期</span><strong>{{ property.lease_period_text }}</strong></div>
+            <div class="price-row"><span>地址</span><strong>{{ property.address }}</strong></div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">💰 价格明细</div>
+            <div class="price-row" style="font-size: 18px; font-weight: 600; border-bottom: 2px solid #f0f0f0; margin-bottom: 16px;">
+                <span>房东原价</span>
+                <strong>£{{ original_annual_price|int }}/年</strong>
+            </div>
+
+            {% if landlord_discounts %}
+            <div class="discount-group">
+                <div style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">
+                    💳 房东优惠
+                    <span class="payer-badge landlord">由房东结算</span>
+                </div>
+                {% for discount in landlord_discounts %}
+                <div class="discount-item">
+                    <span>{{ discount.name }}</span>
+                    <span class="discount-amount">-£{{ discount.amount|int }}</span>
+                </div>
+                {% endfor %}
+                <div class="price-row" style="border-top: 1px dashed #ddd; margin-top: 8px; padding-top: 12px; font-weight: 600;">
+                    <span>小计</span>
+                    <span class="discount-amount">-£{{ total_landlord_discount|int }}</span>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if uhomes_subsidies %}
+            <div class="discount-group">
+                <div style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">
+                    🎁 异乡补贴
+                    <span class="payer-badge uhomes">由异乡好居结算</span>
+                </div>
+                {% for subsidy in uhomes_subsidies %}
+                <div class="discount-item">
+                    <span>{{ subsidy.name }}</span>
+                    <span class="discount-amount">-£{{ subsidy.amount|int }}</span>
+                </div>
+                {% endfor %}
+                <div class="price-row" style="border-top: 1px dashed #ddd; margin-top: 8px; padding-top: 12px; font-weight: 600;">
+                    <span>小计</span>
+                    <span class="discount-amount">-£{{ total_uhomes_subsidy|int }}</span>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if selected_gifts %}
+        <div class="section">
+            <div class="section-title">🎁 异乡赠送礼包</div>
+            <div class="gifts-grid">
+                {% for gift in selected_gifts %}
+                <div class="gift-card">
+                    <div class="gift-icon">{{ gift.icon }}</div>
+                    <div>
+                        <div class="gift-name">{{ gift.name }}</div>
+                        <div class="gift-value">价值£{{ gift.value|int }}</div>
+                        <div style="font-size: 10px; color: #666;">{{ gift.category_name }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div style="background: #FFF9E5; padding: 12px 16px; margin-top: 16px; border-radius: 4px; border-left: 4px solid #FFB800;">
+                <span style="font-size: 15px; color: #856404;">🎉 礼包总价值:</span>
+                <span style="font-size: 20px; font-weight: 700; color: #FF5A5F; margin-left: 8px;">£{{ total_gifts_value|int }}</span>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="final-price-box">
+            <div style="font-size: 16px; color: #666; margin-bottom: 8px;">✨ 您的租金到手价</div>
+            <div class="final-price-value">£{{ final_annual_price|int }}/年</div>
+            <div style="font-size: 18px; color: #666;">(£{{ final_weekly_price|int }}/周)</div>
+            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(0,0,0,0.1); display: flex; justify-content: space-around;">
+                <div style="text-align: center;">
+                    <div style="font-size: 22px; font-weight: 600; color: #4CAF50;">£{{ total_savings|int }}</div>
+                    <div style="font-size: 13px; color: #666; margin-top: 4px;">💰 总节省金额</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 22px; font-weight: 600; color: #4CAF50;">{{ savings_rate|round(1) }}%</div>
+                    <div style="font-size: 13px; color: #666; margin-top: 4px;">📊 优惠幅度</div>
+                </div>
+            </div>
+        </div>
+
+        {% if advisor %}
+        <div class="section">
+            <div class="section-title">👤 您的专属顾问</div>
+            <div style="display: flex; align-items: center; padding: 20px; background: #f8f9fa; border-radius: 12px;">
+                <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #FF5A5F 0%, #E54850 100%); display: flex; align-items: center; justify-center; color: white; font-size: 24px; font-weight: 600; margin-right: 16px;">{{ advisor.avatar_initial }}</div>
+                <div style="flex: 1;">
+                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 6px;">{{ advisor.name }}</div>
+                    <div style="font-size: 14px; color: #666; margin: 4px 0;">📱 {{ advisor.phone }}</div>
+                    <div style="font-size: 14px; color: #666; margin: 4px 0;">💬 {{ advisor.wechat_id }}</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div style="padding: 20px 24px; text-align: center; font-size: 13px; color: #999; background: #f8f9fa;">
+            <p>⏰ 报价有效期: <span style="color: #FF5A5F; font-weight: 600;">{{ valid_until }}</span></p>
+            <p style="margin-top: 8px; color: #666;">异乡好居 · 留学生海外的家</p>
+        </div>
+    </div>
+</body>
+</html>

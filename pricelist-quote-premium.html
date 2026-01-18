@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>异乡好居 - 专属报价单</title>
+    <style>
+        /* ========== CSS 变量系统 ========== */
+        :root {
+            /* 品牌色 */
+            --brand-primary: #FF5A5F;
+            --brand-dark: #E54850;
+            --brand-light: #FFE5E5;
+
+            /* Apple 风格色彩 */
+            --color-text-primary: #1D1D1F;
+            --color-text-secondary: #86868B;
+            --color-text-tertiary: #C4C4C6;
+            --color-background: #FFFFFF;
+            --color-background-elevated: #FAFAFA;
+            --color-surface: #F5F5F7;
+
+            /* 功能色 */
+            --color-success: #34C759;
+            --color-info: #007AFF;
+            --color-warning: #FF9500;
+
+            /* 间距系统 */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            --spacing-2xl: 48px;
+
+            /* 圆角 */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-full: 9999px;
+
+            /* 阴影系统 */
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
+            --shadow-xl: 0 12px 36px rgba(0, 0, 0, 0.10);
+
+            /* 字体系统 */
+            --font-display: "SF Pro Display", -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+            --font-body: "SF Pro Text", -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+        }
+
+        /* ========== 基础样式 ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--color-surface);
+            color: var(--color-text-primary);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ========== 容器 ========== */
+        .quote-container {
+            max-width: 750px;
+            margin: 0 auto;
+            background: var(--color-surface);
+        }
+
+        .quote-card {
+            background: var(--color-background);
+            overflow: hidden;
+        }
+
+        /* ========== 头部区域 ========== */
+        .hero-header {
+            position: relative;
+            background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-dark) 100%);
+            padding: var(--spacing-2xl) var(--spacing-lg);
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .hero-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-logo {
+            font-family: var(--font-display);
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            letter-spacing: 0.5px;
+            margin-bottom: var(--spacing-md);
+            opacity: 0.95;
+        }
+
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: var(--spacing-sm);
+            letter-spacing: -0.5px;
+        }
+
+        .property-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: white;
+            opacity: 0.9;
+            margin-top: var(--spacing-md);
+        }
+
+        /* ========== 内容区块 ========== */
+        .section {
+            padding: var(--spacing-xl) var(--spacing-lg);
+            border-bottom: 1px solid var(--color-surface);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .section-icon {
+            font-size: 24px;
+            line-height: 1;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            letter-spacing: -0.3px;
+        }
+
+        /* ========== 信息行 ========== */
+        .info-grid {
+            display: grid;
+            gap: var(--spacing-md);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: var(--spacing-md) 0;
+            border-bottom: 1px solid var(--color-surface);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-size: 15px;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+        }
+
+        .info-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            text-align: right;
+            max-width: 60%;
+        }
+
+        /* ========== 价格展示 ========== */
+        .price-hero {
+            background: var(--color-background-elevated);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .price-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .price-amount {
+            font-family: var(--font-display);
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            line-height: 1;
+            letter-spacing: -1px;
+        }
+
+        .price-period {
+            font-size: 18px;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+        }
+
+        /* ========== 优惠组 ========== */
+        .discount-card {
+            background: var(--color-background-elevated);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .discount-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-md);
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+        }
+
+        .discount-title {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--color-text-primary);
+        }
+
+        .payer-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .payer-badge.landlord {
+            background: #E3F2FD;
+            color: #1976D2;
+        }
+
+        .payer-badge.uhomes {
+            background: var(--brand-light);
+            color: var(--brand-primary);
+        }
+
+        .discount-list {
+            display: grid;
+            gap: var(--spacing-sm);
+        }
+
+        .discount-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-md);
+            background: white;
+            border-radius: var(--radius-sm);
+        }
+
+        .discount-name {
+            font-size: 15px;
+            color: var(--color-text-primary);
+            font-weight: 500;
+        }
+
+        .discount-amount {
+            font-family: var(--font-display);
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--color-success);
+        }
+
+        .discount-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: var(--spacing-md);
+            padding-top: var(--spacing-md);
+            border-top: 2px dashed rgba(0, 0, 0, 0.08);
+        }
+
+        .discount-total-label {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--color-text-primary);
+        }
+
+        .discount-total-amount {
+            font-family: var(--font-display);
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--color-success);
+        }
+
+        /* ========== 礼品网格 ========== */
+        .gifts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .gift-card {
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gift-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(255, 90, 95, 0.02) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .gift-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--brand-light);
+        }
+
+        .gift-card:hover::before {
+            opacity: 1;
+        }
+
+        .gift-icon {
+            font-size: 40px;
+            margin-bottom: var(--spacing-md);
+            position: relative;
+            z-index: 1;
+        }
+
+        .gift-info {
+            position: relative;
+            z-index: 1;
+        }
+
+        .gift-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .gift-value {
+            font-family: var(--font-display);
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--brand-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .gift-category {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--color-text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .gifts-summary {
+            background: linear-gradient(135deg, #FFF9E5 0%, #FFFBF0 100%);
+            border-left: 4px solid #FFB800;
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .gifts-summary-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: #856404;
+        }
+
+        .gifts-summary-value {
+            font-family: var(--font-display);
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--brand-primary);
+        }
+
+        /* ========== 最终价格 ========== */
+        .final-price-section {
+            background: linear-gradient(135deg, #FFF5F5 0%, #FFE5E5 50%, #FFF9E5 100%);
+            padding: var(--spacing-2xl) var(--spacing-lg);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .final-price-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 90, 95, 0.08) 0%, transparent 70%);
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .final-price-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .final-price-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .final-price-display {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .final-price-amount {
+            font-family: var(--font-display);
+            font-size: 56px;
+            font-weight: 800;
+            color: var(--brand-primary);
+            line-height: 1;
+            letter-spacing: -2px;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .final-price-weekly {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--color-text-secondary);
+        }
+
+        .savings-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-xl);
+            padding-top: var(--spacing-xl);
+            border-top: 2px solid rgba(255, 90, 95, 0.15);
+        }
+
+        .savings-item {
+            text-align: center;
+        }
+
+        .savings-value {
+            font-family: var(--font-display);
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--color-success);
+            line-height: 1;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .savings-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ========== 顾问卡片 ========== */
+        .advisor-card {
+            background: var(--color-background-elevated);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+        }
+
+        .advisor-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: var(--radius-full);
+            background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: var(--font-display);
+            font-size: 28px;
+            font-weight: 700;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(255, 90, 95, 0.2);
+        }
+
+        .advisor-info {
+            flex: 1;
+        }
+
+        .advisor-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .advisor-contact {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            margin: 4px 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ========== 页脚 ========== */
+        .footer {
+            background: var(--color-background-elevated);
+            padding: var(--spacing-xl) var(--spacing-lg);
+            text-align: center;
+        }
+
+        .footer-validity {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .footer-validity-date {
+            font-weight: 700;
+            color: var(--brand-primary);
+        }
+
+        .footer-brand {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--color-text-tertiary);
+        }
+
+        /* ========== 响应式 ========== */
+        @media (max-width: 750px) {
+            .hero-header {
+                padding: var(--spacing-xl) var(--spacing-md);
+            }
+
+            .hero-title {
+                font-size: 24px;
+            }
+
+            .section {
+                padding: var(--spacing-lg) var(--spacing-md);
+            }
+
+            .price-amount {
+                font-size: 40px;
+            }
+
+            .final-price-amount {
+                font-size: 48px;
+            }
+
+            .gifts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ========== 打印样式 ========== */
+        @media print {
+            body {
+                background: white;
+            }
+
+            .quote-container {
+                max-width: 100%;
+            }
+
+            .final-price-section::before {
+                animation: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quote-container">
+        <div class="quote-card">
+            <!-- 头部 -->
+            <div class="hero-header">
+                <div class="hero-content">
+                    <div class="brand-logo">异乡好居</div>
+                    <h1 class="hero-title">专属报价单</h1>
+                    <div class="property-name">{{ property.property_name }}</div>
+                </div>
+            </div>
+
+            <!-- 房源信息 -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-icon">📋</span>
+                    <h2 class="section-title">房源信息</h2>
+                </div>
+                <div class="info-grid">
+                    <div class="info-row">
+                        <span class="info-label">户型</span>
+                        <span class="info-value">{{ property.room_type }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">租期</span>
+                        <span class="info-value">{{ property.lease_period_text }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">地址</span>
+                        <span class="info-value">{{ property.address }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 价格明细 -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-icon">💰</span>
+                    <h2 class="section-title">价格明细</h2>
+                </div>
+
+                <div class="price-hero">
+                    <div class="price-label">房东原价</div>
+                    <div>
+                        <span class="price-amount">£{{ original_annual_price|int }}</span>
+                        <span class="price-period">/年</span>
+                    </div>
+                </div>
+
+                {% if landlord_discounts %}
+                <div class="discount-card">
+                    <div class="discount-header">
+                        <div class="discount-title">
+                            <span>💳</span>
+                            <span>房东优惠</span>
+                        </div>
+                        <span class="payer-badge landlord">房东结算</span>
+                    </div>
+                    <div class="discount-list">
+                        {% for discount in landlord_discounts %}
+                        <div class="discount-item">
+                            <span class="discount-name">{{ discount.name }}</span>
+                            <span class="discount-amount">-£{{ discount.amount|int }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="discount-total">
+                        <span class="discount-total-label">小计</span>
+                        <span class="discount-total-amount">-£{{ total_landlord_discount|int }}</span>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if uhomes_subsidies %}
+                <div class="discount-card">
+                    <div class="discount-header">
+                        <div class="discount-title">
+                            <span>🎁</span>
+                            <span>异乡补贴</span>
+                        </div>
+                        <span class="payer-badge uhomes">异乡结算</span>
+                    </div>
+                    <div class="discount-list">
+                        {% for subsidy in uhomes_subsidies %}
+                        <div class="discount-item">
+                            <span class="discount-name">{{ subsidy.name }}</span>
+                            <span class="discount-amount">-£{{ subsidy.amount|int }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="discount-total">
+                        <span class="discount-total-label">小计</span>
+                        <span class="discount-total-amount">-£{{ total_uhomes_subsidy|int }}</span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- 礼品库 -->
+            {% if selected_gifts %}
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-icon">🎁</span>
+                    <h2 class="section-title">异乡赠送礼包</h2>
+                </div>
+                <div class="gifts-grid">
+                    {% for gift in selected_gifts %}
+                    <div class="gift-card">
+                        <div class="gift-icon">{{ gift.icon }}</div>
+                        <div class="gift-info">
+                            <div class="gift-name">{{ gift.name }}</div>
+                            <div class="gift-value">£{{ gift.value|int }}</div>
+                            <div class="gift-category">{{ gift.category_name }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="gifts-summary">
+                    <span class="gifts-summary-label">🎉 礼包总价值</span>
+                    <span class="gifts-summary-value">£{{ total_gifts_value|int }}</span>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- 最终价格 -->
+            <div class="final-price-section">
+                <div class="final-price-content">
+                    <div class="final-price-label">✨ 您的租金到手价</div>
+                    <div class="final-price-display">
+                        <div class="final-price-amount">£{{ final_annual_price|int }}</div>
+                        <div class="final-price-weekly">(£{{ final_weekly_price|int }}/周)</div>
+                    </div>
+                    <div class="savings-grid">
+                        <div class="savings-item">
+                            <div class="savings-value">£{{ total_savings|int }}</div>
+                            <div class="savings-label">💰 总节省</div>
+                        </div>
+                        <div class="savings-item">
+                            <div class="savings-value">{{ savings_rate|round(1) }}%</div>
+                            <div class="savings-label">📊 优惠幅度</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 顾问信息 -->
+            {% if advisor %}
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-icon">👤</span>
+                    <h2 class="section-title">您的专属顾问</h2>
+                </div>
+                <div class="advisor-card">
+                    <div class="advisor-avatar">{{ advisor.avatar_initial }}</div>
+                    <div class="advisor-info">
+                        <div class="advisor-name">{{ advisor.name }}</div>
+                        <div class="advisor-contact">📱 {{ advisor.phone }}</div>
+                        <div class="advisor-contact">💬 {{ advisor.wechat_id }}</div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- 页脚 -->
+            <div class="footer">
+                <p class="footer-validity">
+                    ⏰ 报价有效期: <span class="footer-validity-date">{{ valid_until }}</span>
+                </p>
+                <p class="footer-brand">异乡好居 · 留学生海外的家</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>异乡好居 - 报价单生成系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #FF5A5F 0%, #E54850 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .form-content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 32px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1D1D1F;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-icon {
+            font-size: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .form-label .required {
+            color: #FF5A5F;
+            margin-left: 2px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e5e5;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #FF5A5F;
+            box-shadow: 0 0 0 3px rgba(255, 90, 95, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* 动态列表 */
+        .dynamic-list {
+            margin-top: 12px;
+        }
+
+        .dynamic-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr auto;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .btn-remove {
+            padding: 8px 16px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .btn-remove:hover {
+            background: #cc0000;
+        }
+
+        .btn-add {
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            margin-top: 8px;
+        }
+
+        .btn-add:hover {
+            background: #45a049;
+            transform: translateY(-1px);
+        }
+
+        /* 礼品选择 */
+        .gifts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .gift-item {
+            border: 2px solid #e5e5e5;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .gift-item:hover {
+            border-color: #FF5A5F;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .gift-item.selected {
+            border-color: #FF5A5F;
+            background: #FFF5F5;
+        }
+
+        .gift-item input[type="checkbox"] {
+            display: none;
+        }
+
+        .gift-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .gift-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .gift-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #FF5A5F;
+        }
+
+        /* 提交按钮 */
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #FF5A5F 0%, #E54850 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(255, 90, 95, 0.3);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 90, 95, 0.4);
+        }
+
+        .btn-submit:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* 结果展示 */
+        .result {
+            display: none;
+            margin-top: 24px;
+            padding: 24px;
+            background: linear-gradient(135deg, #f0fff4 0%, #dcfce7 100%);
+            border-radius: 12px;
+            border: 2px solid #4CAF50;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2d5016;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .result-summary {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .result-item {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .result-item-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        .result-item-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: #FF5A5F;
+        }
+
+        .result-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn-download {
+            padding: 12px;
+            background: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+
+        .btn-download:hover {
+            background: #45a049;
+            transform: translateY(-1px);
+        }
+
+        /* 加载状态 */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #FF5A5F;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #86868B;
+            margin-top: 4px;
+        }
+
+        .error {
+            color: #ff4444;
+            font-size: 13px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 报价单生成系统</h1>
+            <p>异乡好居 · 快速创建专属报价单</p>
+        </div>
+
+        <div class="form-content">
+            <form id="quoteForm">
+                <!-- 房源信息 -->
+                <div class="section">
+                    <div class="section-title">
+                        <span class="section-icon">📋</span>
+                        房源信息
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">房源名称<span class="required">*</span></label>
+                        <input type="text" class="form-input" name="property_name" required placeholder="例如：iQ Shoreditch">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">户型<span class="required">*</span></label>
+                            <input type="text" class="form-input" name="room_type" required placeholder="例如：Bronze Studio">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">周租金 (£)<span class="required">*</span></label>
+                            <input type="number" class="form-input" name="weekly_price" required placeholder="438" step="0.01">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">地址<span class="required">*</span></label>
+                        <input type="text" class="form-input" name="address" required placeholder="2 Silicon Way, London N1 6AT">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">租期开始<span class="required">*</span></label>
+                            <input type="date" class="form-input" name="lease_start" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">租期结束<span class="required">*</span></label>
+                            <input type="date" class="form-input" name="lease_end" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 房东优惠 -->
+                <div class="section">
+                    <div class="section-title">
+                        <span class="section-icon">💳</span>
+                        房东优惠
+                    </div>
+                    <div id="landlordDiscounts" class="dynamic-list"></div>
+                    <button type="button" class="btn-add" onclick="addDiscount('landlord')">
+                        ➕ 添加房东优惠
+                    </button>
+                </div>
+
+                <!-- 异乡补贴 -->
+                <div class="section">
+                    <div class="section-title">
+                        <span class="section-icon">🎁</span>
+                        异乡补贴
+                    </div>
+                    <div id="uhomesSubsidies" class="dynamic-list"></div>
+                    <button type="button" class="btn-add" onclick="addDiscount('uhomes')">
+                        ➕ 添加异乡补贴
+                    </button>
+                </div>
+
+                <!-- 礼品选择 -->
+                <div class="section">
+                    <div class="section-title">
+                        <span class="section-icon">🎉</span>
+                        赠送礼包
+                    </div>
+                    <div id="giftsGrid" class="gifts-grid">
+                        <div style="grid-column: 1/-1; text-align: center; color: #999;">加载中...</div>
+                    </div>
+                </div>
+
+                <!-- 顾问信息 -->
+                <div class="section">
+                    <div class="section-title">
+                        <span class="section-icon">👤</span>
+                        顾问信息
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">姓名<span class="required">*</span></label>
+                        <input type="text" class="form-input" name="advisor_name" required placeholder="张顾问">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">电话</label>
+                            <input type="tel" class="form-input" name="advisor_phone" placeholder="+44 7700 900123">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">微信号</label>
+                            <input type="text" class="form-input" name="advisor_wechat" placeholder="uhomes_zhang">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 提交按钮 -->
+                <button type="submit" class="btn-submit">🚀 生成报价单</button>
+            </form>
+
+            <!-- 加载状态 -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>正在生成报价单...</p>
+            </div>
+
+            <!-- 结果展示 -->
+            <div class="result" id="result">
+                <div class="result-title">
+                    ✅ 报价单生成成功！
+                </div>
+                <div class="result-summary" id="resultSummary"></div>
+                <div class="result-actions">
+                    <a href="#" class="btn-download" id="downloadHtml" download>📄 下载HTML</a>
+                    <a href="#" class="btn-download" id="downloadPng" download>🖼️ 下载PNG图片</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 加载礼品库
+        let giftLibrary = [];
+
+        async function loadGifts() {
+            try {
+                const response = await fetch('/api/gift-library');
+                giftLibrary = await response.json();
+                renderGifts();
+            } catch (error) {
+                console.error('加载礼品库失败:', error);
+            }
+        }
+
+        function renderGifts() {
+            const grid = document.getElementById('giftsGrid');
+            grid.innerHTML = giftLibrary.map(gift => `
+                <label class="gift-item">
+                    <input type="checkbox" name="gifts" value="${gift.id}">
+                    <div class="gift-icon">${gift.icon}</div>
+                    <div class="gift-name">${gift.name}</div>
+                    <div class="gift-value">£${gift.value}</div>
+                </label>
+            `).join('');
+
+            // 添加点击事件
+            document.querySelectorAll('.gift-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const checkbox = this.querySelector('input[type="checkbox"]');
+                    checkbox.checked = !checkbox.checked;
+                    this.classList.toggle('selected', checkbox.checked);
+                });
+            });
+        }
+
+        // 动态添加优惠项
+        let discountIndex = 0;
+
+        function addDiscount(type) {
+            const container = type === 'landlord'
+                ? document.getElementById('landlordDiscounts')
+                : document.getElementById('uhomesSubsidies');
+
+            const id = `discount_${discountIndex++}`;
+            const item = document.createElement('div');
+            item.className = 'dynamic-item';
+            item.innerHTML = `
+                <input type="text" class="form-input" placeholder="优惠名称" data-type="${type}" data-field="name">
+                <input type="number" class="form-input" placeholder="金额" step="0.01" data-type="${type}" data-field="amount">
+                <button type="button" class="btn-remove" onclick="this.parentElement.remove()">删除</button>
+            `;
+            container.appendChild(item);
+        }
+
+        // 表单提交
+        document.getElementById('quoteForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // 收集表单数据
+            const formData = new FormData(this);
+            const data = {
+                property_name: formData.get('property_name'),
+                room_type: formData.get('room_type'),
+                address: formData.get('address'),
+                weekly_price: formData.get('weekly_price'),
+                lease_start: formData.get('lease_start'),
+                lease_end: formData.get('lease_end'),
+                landlord_discounts: [],
+                uhomes_subsidies: [],
+                selected_gifts: [],
+                advisor_name: formData.get('advisor_name'),
+                advisor_phone: formData.get('advisor_phone'),
+                advisor_wechat: formData.get('advisor_wechat'),
+            };
+
+            // 收集房东优惠
+            document.querySelectorAll('#landlordDiscounts .dynamic-item').forEach(item => {
+                const name = item.querySelector('[data-field="name"]').value;
+                const amount = item.querySelector('[data-field="amount"]').value;
+                if (name && amount) {
+                    data.landlord_discounts.push({ name, amount: parseFloat(amount) });
+                }
+            });
+
+            // 收集异乡补贴
+            document.querySelectorAll('#uhomesSubsidies .dynamic-item').forEach(item => {
+                const name = item.querySelector('[data-field="name"]').value;
+                const amount = item.querySelector('[data-field="amount"]').value;
+                if (name && amount) {
+                    data.uhomes_subsidies.push({ name, amount: parseFloat(amount) });
+                }
+            });
+
+            // 收集选中的礼品
+            document.querySelectorAll('input[name="gifts"]:checked').forEach(checkbox => {
+                data.selected_gifts.push(checkbox.value);
+            });
+
+            // 显示加载状态
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('result').classList.remove('show');
+
+            try {
+                // 提交到后端
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // 显示结果
+                    showResult(result);
+                } else {
+                    alert('生成失败: ' + (result.error || '未知错误'));
+                }
+            } catch (error) {
+                alert('生成失败: ' + error.message);
+            } finally {
+                document.getElementById('loading').classList.remove('show');
+            }
+        });
+
+        function showResult(result) {
+            const summary = result.summary;
+            document.getElementById('resultSummary').innerHTML = `
+                <div class="result-item">
+                    <div class="result-item-label">房源</div>
+                    <div class="result-item-value" style="font-size: 16px;">${summary.property_name}</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-item-label">原价</div>
+                    <div class="result-item-value">£${summary.original_price.toFixed(0)}</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-item-label">到手价</div>
+                    <div class="result-item-value">£${summary.final_price.toFixed(0)}</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-item-label">总节省</div>
+                    <div class="result-item-value" style="color: #4CAF50;">£${summary.total_savings.toFixed(0)} (${summary.savings_rate}%)</div>
+                </div>
+            `;
+
+            document.getElementById('downloadHtml').href = `/download/${result.html_file}`;
+            document.getElementById('downloadPng').href = `/download/${result.png_file}`;
+
+            document.getElementById('result').classList.add('show');
+
+            // 滚动到结果
+            document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // 初始化
+        loadGifts();
+
+        // 设置默认租期（今天到一年后）
+        const today = new Date();
+        const nextYear = new Date(today);
+        nextYear.setFullYear(nextYear.getFullYear() + 1);
+
+        document.querySelector('[name="lease_start"]').valueAsDate = today;
+        document.querySelector('[name="lease_end"]').valueAsDate = nextYear;
+    </script>
+</body>
+</html>

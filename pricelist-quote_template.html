@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>异乡好居专属报价单 - {{ property.property_name }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .quote-card {
+            max-width: 750px;
+            margin: 0 auto;
+            background: white;
+            overflow: hidden;
+        }
+
+        /* ========== 头部 ========== */
+        .header {
+            background: linear-gradient(135deg, #FF5A5F 0%, #E54850 100%);
+            color: white;
+            padding: 32px 24px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            letter-spacing: 2px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .property-name {
+            font-size: 18px;
+            opacity: 0.95;
+            font-weight: 500;
+        }
+
+        /* ========== 内容区块 ========== */
+        .section {
+            padding: 24px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 18px;
+            background: #FF5A5F;
+            margin-right: 8px;
+            border-radius: 2px;
+        }
+
+        /* ========== 房源信息 ========== */
+        .property-info {
+            display: grid;
+            gap: 12px;
+            font-size: 15px;
+            color: #333;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .info-label {
+            color: #666;
+            min-width: 60px;
+        }
+
+        .info-value {
+            font-weight: 500;
+            flex: 1;
+            text-align: right;
+        }
+
+        /* ========== 价格明细 ========== */
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            font-size: 16px;
+        }
+
+        .price-row.original {
+            font-size: 18px;
+            font-weight: 600;
+            padding: 16px 0;
+            border-bottom: 2px solid #f0f0f0;
+            margin-bottom: 16px;
+        }
+
+        .price-original-text {
+            color: #333;
+        }
+
+        .price-calculation {
+            text-align: right;
+            line-height: 1.4;
+        }
+
+        .price-weekly {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* ========== 优惠组 ========== */
+        .discount-group {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+
+        .discount-group-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .payer-badge {
+            display: inline-block;
+            font-size: 12px;
+            padding: 3px 10px;
+            border-radius: 4px;
+            margin-left: 8px;
+            font-weight: normal;
+        }
+
+        .payer-badge.landlord {
+            background: #E3F2FD;
+            color: #1976D2;
+        }
+
+        .payer-badge.uhomes {
+            background: #FFE5E5;
+            color: #FF5A5F;
+        }
+
+        .discount-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0 8px 16px;
+            font-size: 15px;
+            color: #555;
+            position: relative;
+        }
+
+        .discount-item::before {
+            content: '├─';
+            position: absolute;
+            left: 0;
+            color: #999;
+        }
+
+        .discount-item:last-child::before {
+            content: '└─';
+        }
+
+        .discount-name {
+            flex: 1;
+        }
+
+        .discount-amount {
+            color: #4CAF50;
+            font-weight: 500;
+            white-space: nowrap;
+            margin-left: 12px;
+        }
+
+        .discount-subtotal {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0 0 0;
+            margin-top: 8px;
+            border-top: 1px dashed #ddd;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* ========== 礼品库展示（新增）========== */
+        .gifts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .gift-card {
+            background: white;
+            border: 2px solid #f0f0f0;
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .gift-card:hover {
+            border-color: #FF5A5F;
+            box-shadow: 0 2px 8px rgba(255, 90, 95, 0.1);
+        }
+
+        .gift-icon {
+            font-size: 32px;
+            margin-right: 12px;
+        }
+
+        .gift-info {
+            flex: 1;
+        }
+
+        .gift-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .gift-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #FF5A5F;
+        }
+
+        .gift-category-badge {
+            display: inline-block;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            background: #f0f0f0;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .gifts-summary {
+            background: #FFF9E5;
+            border-left: 4px solid #FFB800;
+            padding: 12px 16px;
+            margin-top: 16px;
+            border-radius: 4px;
+        }
+
+        .gifts-summary-text {
+            font-size: 15px;
+            color: #856404;
+        }
+
+        .gifts-total-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #FF5A5F;
+            margin-left: 8px;
+        }
+
+        /* ========== 最终价格 ========== */
+        .final-price-box {
+            background: linear-gradient(135deg, #FFF3CD 0%, #FFE5E5 100%);
+            padding: 24px;
+            text-align: center;
+            border-left: 4px solid #FF5A5F;
+        }
+
+        .final-price-label {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .final-price-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #FF5A5F;
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+
+        .final-price-weekly {
+            font-size: 18px;
+            color: #666;
+        }
+
+        .savings-info {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .savings-item {
+            text-align: center;
+        }
+
+        .savings-value {
+            font-size: 22px;
+            font-weight: 600;
+            color: #4CAF50;
+        }
+
+        .savings-label {
+            font-size: 13px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        /* ========== 竞对对比 ========== */
+        .competitor-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        .competitor-table th {
+            background: #f8f9fa;
+            padding: 12px 8px;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .competitor-table td {
+            padding: 12px 8px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 15px;
+        }
+
+        .competitor-table tr.highlight {
+            background: #FFF3CD;
+            font-weight: 600;
+        }
+
+        .competitor-table .advantage {
+            color: #4CAF50;
+            font-weight: 600;
+        }
+
+        .competitor-table .disadvantage {
+            color: #999;
+        }
+
+        .competitor-advantage-box {
+            text-align: center;
+            margin-top: 16px;
+            padding: 12px;
+            background: #E8F5E9;
+            border-radius: 8px;
+        }
+
+        .competitor-advantage-text {
+            font-size: 16px;
+            color: #2E7D32;
+            font-weight: 600;
+        }
+
+        /* ========== 结算说明 ========== */
+        .settlement-notes {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #666;
+            list-style: none;
+        }
+
+        .settlement-notes li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .settlement-notes li::before {
+            content: '•';
+            color: #FF5A5F;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        /* ========== 顾问信息 ========== */
+        .advisor-card {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .advisor-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FF5A5F 0%, #E54850 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+
+        .advisor-details {
+            flex: 1;
+        }
+
+        .advisor-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #333;
+        }
+
+        .advisor-contact {
+            font-size: 14px;
+            color: #666;
+            margin: 4px 0;
+        }
+
+        .qr-code {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #999;
+            border: 2px solid #e0e0e0;
+            flex-shrink: 0;
+        }
+
+        /* ========== 页脚 ========== */
+        .footer {
+            padding: 20px 24px;
+            text-align: center;
+            font-size: 13px;
+            color: #999;
+            background: #f8f9fa;
+        }
+
+        .valid-until {
+            color: #FF5A5F;
+            font-weight: 600;
+        }
+
+        .footer-slogan {
+            margin-top: 8px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="quote-card">
+        <!-- 头部 -->
+        <div class="header">
+            <div class="logo">异乡好居</div>
+            <h1>🏠 专属报价单</h1>
+            <div class="property-name">{{ property.property_name }}</div>
+        </div>
+
+        <!-- 房源信息 -->
+        <div class="section">
+            <div class="section-title">📋 房源信息</div>
+            <div class="property-info">
+                <div class="info-row">
+                    <span class="info-label">户型</span>
+                    <span class="info-value">{{ property.room_type }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">租期</span>
+                    <span class="info-value">{{ property.lease_period_text }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">地址</span>
+                    <span class="info-value">{{ property.address }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 价格明细 -->
+        <div class="section">
+            <div class="section-title">💰 价格明细</div>
+
+            <div class="price-row original">
+                <span class="price-original-text">房东原价</span>
+                <div class="price-calculation">
+                    <div class="price-weekly">£{{ original_weekly_price|round|int }}/周 × {{ property.weeks }}周</div>
+                    <strong>= £{{ original_annual_price|round|int }}/年</strong>
+                </div>
+            </div>
+
+            <!-- 房东优惠 -->
+            {% if landlord_discounts %}
+            <div class="discount-group">
+                <div class="discount-group-title">
+                    💳 房东优惠
+                    <span class="payer-badge landlord">由房东结算</span>
+                </div>
+                {% for discount in landlord_discounts %}
+                <div class="discount-item">
+                    <span class="discount-name">{{ discount.name }}</span>
+                    <span class="discount-amount">-£{{ "{:,.0f}"|format(discount.amount) }}</span>
+                </div>
+                {% endfor %}
+                <div class="discount-subtotal">
+                    <span>小计</span>
+                    <span class="discount-amount">-£{{ "{:,.0f}"|format(total_landlord_discount) }}</span>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- 异乡补贴 -->
+            {% if uhomes_subsidies %}
+            <div class="discount-group">
+                <div class="discount-group-title">
+                    🎁 异乡补贴
+                    <span class="payer-badge uhomes">由异乡好居结算</span>
+                </div>
+                {% for subsidy in uhomes_subsidies %}
+                <div class="discount-item">
+                    <span class="discount-name">{{ subsidy.name }}</span>
+                    <span class="discount-amount">-£{{ "{:,.0f}"|format(subsidy.amount) }}</span>
+                </div>
+                {% endfor %}
+                <div class="discount-subtotal">
+                    <span>小计</span>
+                    <span class="discount-amount">-£{{ "{:,.0f}"|format(total_uhomes_subsidy) }}</span>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- 礼品库（新增）-->
+        {% if selected_gifts %}
+        <div class="section">
+            <div class="section-title">🎁 异乡赠送礼包</div>
+            <div class="gifts-grid">
+                {% for gift in selected_gifts %}
+                <div class="gift-card">
+                    <div class="gift-icon">{{ gift.icon }}</div>
+                    <div class="gift-info">
+                        <div class="gift-name">{{ gift.name }}</div>
+                        <div class="gift-value">
+                            {% if gift.is_free %}
+                            免费
+                            {% else %}
+                            价值£{{ "{:,.0f}"|format(gift.value) }}
+                            {% endif %}
+                        </div>
+                        <div class="gift-category-badge">{{ gift.category_name }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if total_gifts_value > 0 %}
+            <div class="gifts-summary">
+                <span class="gifts-summary-text">🎉 礼包总价值:</span>
+                <span class="gifts-total-value">£{{ "{:,.0f}"|format(total_gifts_value) }}</span>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- 最终价格 -->
+        <div class="final-price-box">
+            <div class="final-price-label">✨ 您的租金到手价</div>
+            <div class="final-price-value">£{{ "{:,.0f}"|format(final_annual_price) }}/年</div>
+            <div class="final-price-weekly">(£{{ final_weekly_price|round|int }}/周)</div>
+
+            <div class="savings-info">
+                <div class="savings-item">
+                    <div class="savings-value">£{{ "{:,.0f}"|format(total_savings) }}</div>
+                    <div class="savings-label">💰 总节省金额</div>
+                </div>
+                <div class="savings-item">
+                    <div class="savings-value">{{ savings_rate|round(1) }}%</div>
+                    <div class="savings-label">📊 优惠幅度</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 竞对对比 -->
+        {% if competitor_prices %}
+        <div class="section">
+            <div class="section-title">📊 竞对价格对比</div>
+            <table class="competitor-table">
+                <thead>
+                    <tr>
+                        <th>平台</th>
+                        <th>周租金</th>
+                        <th>年租金</th>
+                        <th>差价</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for comp in competitor_prices %}
+                    <tr>
+                        <td>{{ comp.platform }}</td>
+                        <td>£{{ comp.weekly_price|round|int }}</td>
+                        <td>£{{ "{:,.0f}"|format(comp.annual_price) }}</td>
+                        <td class="disadvantage">+£{{ "{:,.0f}"|format(comp.annual_price - final_annual_price) }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="highlight">
+                        <td>异乡好居</td>
+                        <td>£{{ final_weekly_price|round|int }}</td>
+                        <td>£{{ "{:,.0f}"|format(final_annual_price) }}</td>
+                        <td class="advantage">✅ 最低</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            {% if advantage_vs_competitor %}
+            <div class="competitor-advantage-box">
+                <div class="competitor-advantage-text">
+                    🏆 比市场价再低 £{{ "{:,.0f}"|format(advantage_vs_competitor) }} ({{ advantage_rate|round(1) }}%)
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- 结算说明 -->
+        <div class="section">
+            <div class="section-title">📝 结算说明</div>
+            <ul class="settlement-notes">
+                <li>房东优惠：直接体现在合同价格中</li>
+                <li>异乡补贴：体现在支付价格中</li>
+                <li>异乡返现：签约后7-10个工作日到账</li>
+                <li>返现方式：微信红包/支付宝/银行卡</li>
+                {% if selected_gifts %}
+                <li>赠送礼包：签约后根据具体礼品发放</li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <!-- 顾问信息 -->
+        {% if advisor %}
+        <div class="section">
+            <div class="section-title">👤 您的专属顾问</div>
+            <div class="advisor-card">
+                <div class="advisor-avatar">{{ advisor.avatar_initial }}</div>
+                <div class="advisor-details">
+                    <div class="advisor-name">{{ advisor.name }}</div>
+                    <div class="advisor-contact">📱 {{ advisor.phone }}</div>
+                    <div class="advisor-contact">💬 {{ advisor.wechat_id }}</div>
+                </div>
+                <div class="qr-code">
+                    {% if advisor.qr_code_url %}
+                    <img src="{{ advisor.qr_code_url }}" style="width: 100%; height: 100%;">
+                    {% else %}
+                    扫码添加
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 页脚 -->
+        <div class="footer">
+            <p>⏰ 报价有效期: <span class="valid-until">{{ valid_until }}</span></p>
+            <p class="footer-slogan">异乡好居 · 留学生海外的家</p>
+        </div>
+    </div>
+</body>
+</html>
